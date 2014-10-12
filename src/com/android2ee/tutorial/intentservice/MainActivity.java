@@ -15,24 +15,38 @@ import com.example.com.android2ee.intentservice.R;
 
 /**
  * @author florian
- * 
+ * MainActivity
+ * Notre Activité principale, qui nous permet de récupérer les infos météo de Toulouse et Londres et ensuite
+ * de permettre à l'utilisateur de choisir quelle donnée il souhaite afficher
  */
 public class MainActivity extends Activity {
-	Button btnToulouse, btnLondon;
-	String strTlseForecast, strLondonForecast;
+	// interface
+	private Button btnToulouse, btnLondon;
+	private TextView result;
+	
+	// variable
+	private String strTlseForecast, strLondonForecast;
 	boolean tlseVisible = true;
-	TextView result;
+	
+	// constante
 	private static final String LONDON = "London";
 	private static final String TOULOUSE = "Toulouse";
 
+	/**
+	 * 
+	 * @author florian
+	 * BroadCast Receiver
+	 * reçoit l' action ACTION_RESP et affiche le nouveau texte dans la textView
+	 */
 	public class MyReceiver extends BroadcastReceiver {
+		// action
 		public static final String ACTION_RESP = "com.myapp.intent.action.TEXT_TO_DISPLAY";
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String text = intent
 					.getStringExtra(DownloadSourceService.SOURCE_URL);
-			// send text to display
+			// on récupère le texte reçue
 			if (intent.getStringExtra(DownloadSourceService.CITY).equals(
 					TOULOUSE)) {
 				strTlseForecast = text;
@@ -40,21 +54,25 @@ public class MainActivity extends Activity {
 					.equals(LONDON)) {
 				strLondonForecast = text;
 			}
+			// on affiche le texte en fonction de la ville liée
 			changeCity(tlseVisible);
 
 		}
 	}
 
+	// variable 
 	private MyReceiver receiver;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		// on initialise les variables d'interface
 		result = (TextView) findViewById(R.id.text_result);
 		btnLondon = (Button) findViewById(R.id.btnLondon);
 		btnToulouse = (Button) findViewById(R.id.btnToulouse);
-		// ajout des listeners
+		// on ajoute les listeners sur les boutons
 		btnLondon.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -71,12 +89,14 @@ public class MainActivity extends Activity {
 		receiver = new MyReceiver();
 		// on lance le service
 		Intent msgIntent = new Intent(this, DownloadSourceService.class);
+		// l'url pour récupérer les données de la météo de Londres
 		msgIntent
 				.putExtra(DownloadSourceService.URL,
 						"http://api.openweathermap.org/data/2.5/weather?q=London&mode=xml");
 
 		msgIntent.putExtra(DownloadSourceService.CITY, LONDON);
 		startService(msgIntent);
+		// l'url pour récupérer les données de la météo de Toulouse
 		msgIntent
 				.putExtra(DownloadSourceService.URL,
 						"http://api.openweathermap.org/data/2.5/weather?q=Toulouse&mode=xml");
@@ -86,7 +106,8 @@ public class MainActivity extends Activity {
 	}
 
 	/**
-	 * @param isTlseVisible
+	 * permet d'afficher le texte en fonction de la ville choisie préalablement
+	 * @param isTlseVisible : Toulouse ou Londres
 	 */
 	private void changeCity(boolean isTlseVisible) {
 		tlseVisible = isTlseVisible;

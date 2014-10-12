@@ -12,14 +12,25 @@ import com.android2ee.tutorial.intentservice.MainActivity.MyReceiver;
 import android.app.IntentService;
 import android.content.Intent;
 
+/**
+ * 
+ * @author florian
+ * Notre IntentService, permettant de récupérer les donneés depuis une url donnée
+ */
 public class DownloadSourceService extends IntentService {
 
+	// constante
 	public static final String URL = "urlpath";
 	public static final String SOURCE_URL = "destination_source";
 	public static final String CITY = "city_location";
 		
+	/**
+	 * constructeur
+	 */
 	public DownloadSourceService() {
 		 super("DownloadService");
+		 // on autorise à relancer le service si celui-ci est terminé par le système
+		 setIntentRedelivery(true);
 	}
 	
 	/**
@@ -31,6 +42,7 @@ public class DownloadSourceService extends IntentService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
        int result = super.onStartCommand(intent, flags, startId);
+      
        return result;
     }
 
@@ -60,14 +72,8 @@ public class DownloadSourceService extends IntentService {
 			// on ferme bien tout les flux
 			if ( r != null) {
 				try {
+					// nous n'avons pas besoin de ferme les autres flux, la fermeture est inclus depuis la méthode close() du BufferedReader
 					r.close();
-				} catch (IOException e) {
-					// message d'erreur
-				}
-			}
-			if (is != null) {
-				try {
-					is.close();
 				} catch (IOException e) {
 					// message d'erreur
 				}
